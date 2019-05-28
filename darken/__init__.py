@@ -1,3 +1,9 @@
+"""
+Apply black only on mdified files
+"""
+
+__version__ = '0.0.1'
+
 import black
 import argparse
 import sys
