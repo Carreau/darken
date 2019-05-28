@@ -11,5 +11,5 @@ classifiers = ["License :: OSI Approved :: MIT License"]
 
 
 [tool.flit.scripts]
-flit = "darken:main"
+darken = "darken:main"
 
