@@ -54,7 +54,9 @@ def filtermark(gen):
 
 
 
-def main(argv):
+def main(argv=None):
+    if argv is None:
+        argv = sys.argv
     parser = argparse.ArgumentParser(description='Apply black only to some specific lines of a file.')
     parser.add_argument('filename', metavar='filename', type=str,
                     help='filename to process')
@@ -79,4 +81,4 @@ def main(argv):
     #    print(f"{i:02}", l)
     
 if __name__ == '__main__':
-    main(sys.argv)
+    main()
