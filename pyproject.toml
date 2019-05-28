@@ -8,6 +8,7 @@ author = "Matthias Bussonnier"
 author-email = "bussonniermatthias@gmail.com"
 home-page = "https://github.com/Carreau/darken"
 classifiers = ["License :: OSI Approved :: MIT License"]
+description-file = "readme.md"
 
 
 [tool.flit.scripts]

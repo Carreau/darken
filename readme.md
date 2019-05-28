@@ -2,6 +2,23 @@
 
 POC, still a lot of work. 
 
+## what
+
+```
+darken --since <git commitish>
+```
+
+Will (try to) reformat only modified lines since `<commit-ish>`
+
+or 
+```
+darken --range 12-34,64-67 foo.py
+```
+
+Should only reformat line 12-34 and 64-67 of foo.py.
+
+# how
+
 Looking at black internal it seem relatively hard to pass a flag tell it to only
 refactor some nodes. But, black support fmt:on/off comments; 
 
