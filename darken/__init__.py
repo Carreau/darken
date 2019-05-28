@@ -53,21 +53,8 @@ def filtermark(gen):
         return
 
 
-
-def main(argv=None):
-    if argv is None:
-        argv = sys.argv[1:]
-    print('this is argv:',argv)
-    parser = argparse.ArgumentParser(prog='darken', description='Apply black only to some specific lines of a file.')
-    parser.add_argument('--ranges', help='which lines to apply darken to')
-    parser.add_argument('filename', nargs="+", help='filename to process', metavar='FN', action='append')
-    parsed = None
-    parsed = parser.parse_args(argv)
-    #res = parse.ranges
-    sys.exit(parsed)
-    ranges = parse_range_list(res)
-
-    with open(res.filename, 'r') as f:
+def darken_file(filename, ranges, dry_run):
+    with open(filename, 'r') as f:
         s = f.read()
     
     s = '\n'.join(insert_marks(s.splitlines(), ranges))
@@ -75,12 +62,68 @@ def main(argv=None):
     res = black.format_str(s, mode=black.FileMode())
     
     lines = res.splitlines()
-    
+   
     re_lines = list(filtermark(iter(lines)))
-    with open(res.filename, 'w') as f:
-        f.write('\n'.join(re_lines))
-    #for i,l in enumerate(re_lines, start=1):
-    #    print(f"{i:02}", l)
+    
+    if not dry_run:
+        with open(filename, 'w') as f:
+            f.write('\n'.join(re_lines))
+    else:
+        for i,l in enumerate(re_lines, start=1):
+            print(f"{i:02}", l)
+
+
+
+def main(argv=None):
+    if argv is None:
+        argv = sys.argv[1:]
+    parser = argparse.ArgumentParser(prog='darken', description='Apply black only to some specific lines of a file.')
+    parser.add_argument('--ranges', help='which lines to apply darken to')
+    parser.add_argument('--since', help='comitish')
+    parser.add_argument('--dry-run', help='', action='store_true')
+    parser.add_argument('filename', nargs='?', help='filename to process')
+    parsed = parser.parse_args(argv)
+    print(parsed)
+
+    res = parsed.ranges
+    if res:
+        ranges = parse_range_list(res)
+    if parsed.since:
+        from collections import defaultdict
+        dct = defaultdict(lambda:[])
+        print('trying to extract changes since', parsed.since)
+        import subprocess
+        sub = subprocess.run(['git','diff', '-U0', parsed.since], stdout=subprocess.PIPE)
+        current_file = None
+        for line in  sub.stdout.decode().splitlines():
+            if line.startswith('+++'):
+                current_file = line[5:]
+                continue
+            if line.startswith('@@'):
+                res,add = line.split('@@')[1][1:-1].split(' ')
+                from_,lenght,*_ = add.split(',')+['1']
+                print(current_file, int(from_), int(from_)+int(lenght) )
+                dct[current_file].append((int(from_), int(from_)+int(lenght)))
+
+
+            else:
+                continue
+
+        for k,v in dct.items():
+            if k == 'dev/null':
+                continue
+            ranges = set(chain(*[range(start,stop+1) for start,stop in v]))
+            print(k,ranges)
+            try:
+                darken_file(k[1:], ranges,  parsed.dry_run)
+            except: 
+                pass
+        sys.exit()
+
+    filename = parsed.filename
+
+    darken_file(filename, ranges,  parsed.dry_run)
+
     
 if __name__ == '__main__':
     main()
