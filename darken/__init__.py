@@ -56,13 +56,15 @@ def filtermark(gen):
 
 def main(argv=None):
     if argv is None:
-        argv = sys.argv
-    parser = argparse.ArgumentParser(description='Apply black only to some specific lines of a file.')
-    parser.add_argument('filename', metavar='filename', type=str,
-                    help='filename to process')
-    parser.add_argument('--ranges', dest='ranges', metavar='ranges', help='')
-    res = parser.parse_args(argv).ranges
-    res = '1-21'
+        argv = sys.argv[1:]
+    print('this is argv:',argv)
+    parser = argparse.ArgumentParser(prog='darken', description='Apply black only to some specific lines of a file.')
+    parser.add_argument('--ranges', help='which lines to apply darken to')
+    parser.add_argument('filename', nargs="+", help='filename to process', metavar='FN', action='append')
+    parsed = None
+    parsed = parser.parse_args(argv)
+    #res = parse.ranges
+    sys.exit(parsed)
     ranges = parse_range_list(res)
 
     with open(res.filename, 'r') as f:
