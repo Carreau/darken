@@ -8,11 +8,6 @@ import black
 import argparse
 import sys
 
-MARK = """\
-# fmt: {}  # bm12
-"""
-
-
 from itertools import chain
 
 def parse_range(rng):
@@ -47,6 +42,15 @@ def insert_marks(lines, ranges):
         yield line
 
 
+def filtermark(gen):
+    try:
+        for l in gen:
+            if l.strip().endswith('# bm12'):
+                next(gen)
+                continue
+            yield l
+    except StopIteration:
+        return
 
 
 
@@ -59,29 +63,20 @@ def main(argv):
     res = '1-21'
     ranges = parse_range_list(res)
 
-    with open('setup.py', 'r') as f:
+    with open(res.filename, 'r') as f:
         s = f.read()
-    
     
     s = '\n'.join(insert_marks(s.splitlines(), ranges))
     res = s
     res = black.format_str(s, mode=black.FileMode())
     
-    def filtermark(gen):
-        try:
-            for l in gen:
-                if l.strip().endswith('# bm12'):
-                    next(gen)
-                    continue
-                yield l
-        except StopIteration:
-            return
-    
     lines = res.splitlines()
     
     re_lines = list(filtermark(iter(lines)))
-    for i,l in enumerate(re_lines, start=1):
-        print(f"{i:02}", l)
+    with open(res.filename, 'w') as f:
+        f.write('\n'.join(re_lines))
+    #for i,l in enumerate(re_lines, start=1):
+    #    print(f"{i:02}", l)
     
 if __name__ == '__main__':
     main(sys.argv)
