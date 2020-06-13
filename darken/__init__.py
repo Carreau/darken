@@ -1,8 +1,11 @@
 """
-Apply black only on mdified files
+Deprecated, see darker that have a saner approach.
+
+
+https://pypi.org/project/darker/
 """
 
-__version__ = '0.0.3'
+__version__ = '0.0.4'
 
 import black
 import argparse
@@ -75,6 +78,8 @@ def darken_file(filename, ranges, dry_run):
 
 
 def main(argv=None):
+    import warnings
+    print('Deprecated, see darker. https://pypi.org/project/darker')
     if argv is None:
         argv = sys.argv[1:]
     parser = argparse.ArgumentParser(prog='darken', description='Apply black only to some specific lines of a file.')
@@ -118,11 +123,13 @@ def main(argv=None):
                 darken_file(k[1:], ranges,  parsed.dry_run)
             except: 
                 pass
+        print('Deprecated, see darker. https://pypi.org/project/darker')
         sys.exit()
 
     filename = parsed.filename
 
     darken_file(filename, ranges,  parsed.dry_run)
+    print('Deprecated, see darker. https://pypi.org/project/darker')
 
     
 if __name__ == '__main__':
